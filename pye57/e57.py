@@ -161,9 +161,12 @@ class E57:
                   colors=False,
                   row_column=False,
                   transform=True,
-                  ignore_missing_fields=False) -> Dict:
+                  ignore_missing_fields=False, 
+                  buffer_size=None) -> Dict:
         header = self.get_header(index)
         n_points = header.point_count
+        if buffer_size is None:
+            buffer_size=n_points
 
         coordinate_system = header.get_coordinate_system(COORDINATE_SYSTEMS)
         if coordinate_system is COORDINATE_SYSTEMS.CARTESIAN:
@@ -191,7 +194,7 @@ class E57:
                     raise ValueError("Requested to read a field (%s) with is absent from the e57 file. "
                                      "Consider using 'ignore_missing_fields' to skip it." % field)
 
-        data, buffers = self.make_buffers(fields, n_points)
+        data, buffers = self.make_buffers(fields, buffer_size)
         header.points.reader(buffers).read()
 
         if validState in data:
